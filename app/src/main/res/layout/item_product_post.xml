@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:background="?android:attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/tvProductName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="제품 이름"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/tvProductMaterial"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="재질: 플라스틱"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/tvProductTimestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="등록일: 2023-01-01"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+</LinearLayout>
