@@ -8,6 +8,7 @@ import java.util.Date;
     작성자 최혁 (griscaf@gmail.com)
  */
 public class User {
+    private static User instance;
     private String email;
     private String nickname;
     private int point;
@@ -16,12 +17,23 @@ public class User {
 
     public User() {
     }
+
+    public static User getInstance() {
+        if (instance == null) {
+            instance = new User();
+        }
+        return instance;
+    }
     public User(String _email, String _nickname, int _point) {
         this.email = _email;
         this.nickname = _nickname;
         this.point = _point;
     }
-
+    public void init(String _email, String _nickname, int _point) {
+        this.email = _email;
+        this.nickname = _nickname;
+        this.point = _point;
+    }
     public String getEmail() {
         return email;
     }

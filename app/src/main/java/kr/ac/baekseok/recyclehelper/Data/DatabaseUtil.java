@@ -34,10 +34,4 @@ public class DatabaseUtil {
                     callback.onCallback(null);
                 });
     }
-    public static interface FirestoreCallback {
-        void onCallback(boolean isSuccess);
-    }
-    public interface FirestoreCallbackReading<T> {
-        void onCallback(T data);
-    }
 }

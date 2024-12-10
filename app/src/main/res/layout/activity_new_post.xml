@@ -1,0 +1,25 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/edt_post_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="제목 입력" />
+
+    <EditText
+        android:id="@+id/edt_post_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="내용 입력"
+        android:minLines="5" />
+
+    <Button
+        android:id="@+id/btn_submit_post"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="등록" />
+</LinearLayout>

@@ -51,7 +51,7 @@ public class ProfileFragment extends Fragment {
                 });
                 return;
             }
-            User player = ((User) back);
+            User player = User.getInstance();
             tv_nickname.setText(player.getNickname() + "님 환영합니다 !");
             tv_point.setText(player.getPoint() + "P");
         });
