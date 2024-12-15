@@ -1,5 +1,4 @@
 package kr.ac.baekseok.recyclehelper;
-import static kr.ac.baekseok.recyclehelper.Data.ProductStorage.SaveProduct;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,21 +6,20 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import kr.ac.baekseok.recyclehelper.Data.DatabaseManager;
+import java.util.ArrayList;
+import java.util.List;
+
 import kr.ac.baekseok.recyclehelper.Data.DatabaseUtil;
-import kr.ac.baekseok.recyclehelper.Data.Product;
+import kr.ac.baekseok.recyclehelper.Data.SaleItem;
 import kr.ac.baekseok.recyclehelper.Data.User;
 
 public class LoginActivity extends AppCompatActivity {
@@ -34,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        db = DatabaseManager.getInstance().getDatabase();
+        db = FirebaseFirestore.getInstance();
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
@@ -97,7 +95,8 @@ public class LoginActivity extends AppCompatActivity {
                                         Toast.makeText(this, "닉네임이 중복되었습니다. 다른 닉네임을 사용해주세요.", Toast.LENGTH_SHORT).show();
                                         return;
                                     }
-                                    User user = new User(email, nickName, 0);
+                                    List<SaleItem> list = new ArrayList<SaleItem>();
+                                    User user = new User(email, nickName, 0, 0, list);
                                     DatabaseUtil.saveUserInfo(db, user, isSuccess -> {
                                         Toast.makeText(this, "회원가입 성공 !", Toast.LENGTH_SHORT).show();
                                     });

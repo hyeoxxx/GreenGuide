@@ -54,5 +54,6 @@ public class CommunityFragment extends Fragment {
         boardList.add(new Board("3", "공지사항", "중요한 공지사항이 올라오는 곳입니다."));
         boardList.add(new Board("1", "자유게시판", "일반적인 이야기를 나누는 곳입니다."));
         boardList.add(new Board("2", "질문게시판", "질문과 답변을 주고받는 곳입니다."));
+        boardList.add(new Board("4", "제품별 재활용 방법들", "제품에 대한 재활용 방법을 확인할 수 있어요."));
     }
 }

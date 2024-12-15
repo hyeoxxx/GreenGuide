@@ -15,18 +15,20 @@ public class Product {
     private String category;
     @ServerTimestamp
     private Date timestamp;
+    private String postId;
 
     public Product() {
         /*
         파이어베이스 사용할 때 필요?
          */
     }
-    public Product(String _number, String _name, String _material, boolean _recyclable, String _category) {
+    public Product(String _number, String _name, String _material, boolean _recyclable, String _category, String _postId) {
         this.number = _number;
         this.name = _name;
         this.material = _material;
         this.recyclable = _recyclable;
         this.category = _category;
+        this.postId = _postId;
     }
 
     public String getNumber() {
@@ -64,5 +66,10 @@ public class Product {
     public Date getTimestamp() {
         return timestamp;
     }
-
+    public void setPostId(String id) {
+        postId = id;
+    }
+    public String getPostId() {
+        return postId;
+    }
 }

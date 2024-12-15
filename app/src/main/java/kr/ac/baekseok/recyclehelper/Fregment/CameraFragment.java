@@ -2,8 +2,6 @@ package kr.ac.baekseok.recyclehelper.Fregment;
 
 import static kr.ac.baekseok.recyclehelper.Data.ProductStorage.SaveProduct;
 
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -31,13 +29,16 @@ import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.common.InputImage;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import kr.ac.baekseok.recyclehelper.Data.DatabaseManager;
+import kr.ac.baekseok.recyclehelper.Community.Post;
 import kr.ac.baekseok.recyclehelper.Data.Product;
 import kr.ac.baekseok.recyclehelper.Data.ProductStorage;
+import kr.ac.baekseok.recyclehelper.LoginActivity;
+import kr.ac.baekseok.recyclehelper.NewPostActivity;
+import kr.ac.baekseok.recyclehelper.PostDetailActivity;
+import kr.ac.baekseok.recyclehelper.PostListActivity;
 import kr.ac.baekseok.recyclehelper.R;
 
 public class CameraFragment extends Fragment {
@@ -50,6 +51,8 @@ public class CameraFragment extends Fragment {
     private TextView txtResult;
     private Button btnShow;
     private FirebaseFirestore db;
+    private String barNum, barName;
+    private Product item;
 
     @Nullable
     @Override
@@ -59,20 +62,71 @@ public class CameraFragment extends Fragment {
         imgPreview = view.findViewById(R.id.img_preview);
         txtResult = view.findViewById(R.id.txt_result);
         btnShow = view.findViewById(R.id.btn_how);
-        db = DatabaseManager.getInstance().getDatabase();
+        db = FirebaseFirestore.getInstance();
 
         btnShow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getContext(), "재활용 정보 출력 예정", Toast.LENGTH_SHORT).show();
-            }
-        });
+                                       @Override
+                                       public void onClick(View view) {
+                                           if (barNum == null || item == null) {
+                                               Toast.makeText(getContext(), "제품 정보를 정상적으로 불러오지 않았습니다.", Toast.LENGTH_SHORT).show();
+                                               return;
+                                           }
+                                           HasRecycleInfo(item.getPostId(), result -> {
+                                               if (result == null) {
+                                                       AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                                       builder.setTitle("환경에 기여해주세요 !");
+                                                       builder.setMessage("아직 이 제품에 대한 재활용 방법이 작성되지 않았어요.\n작성해주신다면 100P를 지급해드려요 !");
+
+                                                       builder.setPositiveButton("예", (dialog, which) -> {
+                                                           Intent intent = new Intent(getContext(), NewPostActivity.class);
+                                                           intent.putExtra("barName", barName);
+                                                           intent.putExtra("barcode", barNum);
+                                                           intent.putExtra("boardId", "4");
+                                                           startActivity(intent);
+                                                       });
+                                                       builder.setNegativeButton("아니오", (dialog, which) -> {
+                                                           dialog.dismiss();
+                                                       });
+
+                                                       builder.show();
+                                               } else {
+                                                   Intent intent = new Intent(getContext(), PostDetailActivity.class);
+                                                   intent.putExtra("postId", ((Product)result).getPostId());
+                                                   startActivity(intent);
+                                               }
+                                           });
+                                       }
+                                   });
 
         showOptionDialog();
 
         return view;
     }
 
+    public interface FirestoreCallbackReading<T> {
+        void onCallback(T data);
+    }
+    private void HasRecycleInfo(String where, FirestoreCallbackReading callback) {
+        db.collection("Products")
+                .whereEqualTo("postId", where)
+                .get()
+                .addOnSuccessListener(task -> {
+                    if (!task.getDocuments().isEmpty()) {
+                        if (task.getDocuments().get(0).exists()) {
+                            Product temp = task.getDocuments().get(0).toObject(Product.class);
+                            callback.onCallback(temp);
+                        } else {
+                            callback.onCallback(null);
+                        }
+                    } else {
+                        callback.onCallback(null);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("Firestore", "불러오기 실패...", e);
+                    callback.onCallback(null);
+                });
+    }
     private void showOptionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("사진 선택")
@@ -143,15 +197,14 @@ public class CameraFragment extends Fragment {
                     StringBuilder result = new StringBuilder();
                     AtomicInteger remainingTasks = new AtomicInteger(barcodes.size());
                     for (Barcode barcode : barcodes) {
-                        Log.d("BarcodeProcessing", "처리 중인 바코드: " + barcode.getDisplayValue());
                         ProductStorage.ReadProduct(db, barcode.getDisplayValue(), product -> {
                             if (product == null) {
-                                Log.d("BarcodeProcessing", "제품 정보 없음: " + barcode.getDisplayValue());
                                 showAddProductDialog(barcode.getDisplayValue(), db);
                                 return;
-                            } else {
-                                Log.d("FirebaseQuery", "제품 정보: " + ((Product) product).getName());
                             }
+                            item = (Product)product;
+                            barName = ((Product)product).getName();
+                            barNum = barcode.getDisplayValue();
                             result.append("바코드 값: ").append(barcode.getDisplayValue()).append("\n");
                             result.append("제품 이름: ").append(((Product)product).getName()).append("\n");
                             result.append("주요 재질: ").append(((Product)product).getMaterial()).append("\n");
@@ -186,9 +239,13 @@ public class CameraFragment extends Fragment {
             String productMaterial = edtMaterial.getText().toString().trim();
             if (!productName.isEmpty() && !productCategory.isEmpty()) {
                 // Firebase ㅇㅅㅇ
-                Product newProduct = new Product(barcodeValue, productName, productMaterial, isRecyclable, productCategory);
+                Product newProduct = new Product(barcodeValue, productName, productMaterial, isRecyclable, productCategory, "");
                 SaveProduct(db, newProduct, isSuccess -> {
                     Toast.makeText(getContext(), "제품 정보가 등록되었습니다.", Toast.LENGTH_SHORT).show();
+
+                    barName = newProduct.getName();
+                    barNum = barcodeValue;
+                    item = newProduct;
                 });
             } else {
                 Toast.makeText(getContext(), "모든 필드를 입력해주세요.", Toast.LENGTH_SHORT).show();

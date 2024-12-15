@@ -5,12 +5,16 @@
         android:title="홈" />
     <item
         android:id="@+id/nav_community"
-        android:icon="@drawable/ic_home"
+        android:icon="@drawable/ic_community"
         android:title="커뮤니티"/>
     <item
         android:id="@+id/nav_camera"
         android:icon="@drawable/ic_camera"
         android:title="바코드 스캔" />
+    <item
+        android:id="@+id/nav_shop"
+        android:icon="@drawable/ic_shoping"
+        android:title="포인트샵" />
     <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/ic_user"

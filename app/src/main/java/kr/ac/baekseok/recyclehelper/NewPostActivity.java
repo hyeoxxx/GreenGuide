@@ -16,6 +16,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import kr.ac.baekseok.recyclehelper.Community.CommunityUtils;
 import kr.ac.baekseok.recyclehelper.Community.Post;
+import kr.ac.baekseok.recyclehelper.Data.Product;
+import kr.ac.baekseok.recyclehelper.Data.ProductStorage;
 import kr.ac.baekseok.recyclehelper.Data.User;
 import kr.ac.baekseok.recyclehelper.R;
 
@@ -25,6 +27,7 @@ public class NewPostActivity extends AppCompatActivity {
     private Button btnSubmit;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String boardId;
+    private String barNum, barName;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,11 +37,17 @@ public class NewPostActivity extends AppCompatActivity {
         edtTitle = findViewById(R.id.edt_post_title);
         edtContent = findViewById(R.id.edt_post_content);
         btnSubmit = findViewById(R.id.btn_submit_post);
+        barNum = getIntent().getStringExtra("barcode");
+        barName = getIntent().getStringExtra("barName");
 
         // 게시판 ID 가져오기
         boardId = getIntent().getStringExtra("boardId");
-
+        if (barNum != null) {
+            edtTitle.setText(barName + "(" + barNum + ")");
+            edtTitle.setEnabled(false);
+        }
         btnSubmit.setOnClickListener(v -> submitPost());
+
     }
 
     private void submitPost() {
@@ -66,6 +75,25 @@ public class NewPostActivity extends AppCompatActivity {
         CommunityUtils.addPost(newPost, new CommunityUtils.FirestoreCallback<Void>() {
             @Override
             public void onSuccess(Void result) {
+                if (barNum != null) {
+                    ProductStorage.ReadProduct(db, barNum, callback -> {
+                        if (callback == null) {
+                            return;
+                        }
+                        Product product = (Product)callback;
+                        product.setPostId(postId);
+                        ProductStorage.SaveProduct(db, product, call -> {
+                            if (!call) {
+                                Toast.makeText(NewPostActivity.this, "문제 발생", Toast.LENGTH_SHORT).show();
+                            } else {
+                                User user = User.getInstance();
+                                user.gainPoint(100);
+                                user.gainRate(100);
+                                user = null;
+                            }
+                        });
+                    });
+                }
                 Toast.makeText(NewPostActivity.this, "게시물이 등록되었습니다.", Toast.LENGTH_SHORT).show();
                 finish();
             }

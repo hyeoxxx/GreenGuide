@@ -25,6 +25,7 @@
         <activity android:name=".PostDetailActivity" />
         <activity android:name=".PostListActivity" />
         <activity android:name=".NewPostActivity" />
+        <activity android:name=".InventoryActivity" />
 
     </application>
 

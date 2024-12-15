@@ -12,7 +12,13 @@
         android:text="제품 이름"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_marginBottom="4dp" />
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="바코드 번호 : "
+        android:id="@+id/tvProductNumber"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_marginBottom="4dp"/>
     <TextView
         android:id="@+id/tvProductMaterial"
         android:layout_width="wrap_content"

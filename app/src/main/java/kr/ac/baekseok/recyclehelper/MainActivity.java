@@ -1,10 +1,8 @@
 package kr.ac.baekseok.recyclehelper;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,22 +17,20 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.io.File;
+import java.util.ArrayList;
 
-import kr.ac.baekseok.recyclehelper.Data.DatabaseManager;
 import kr.ac.baekseok.recyclehelper.Data.DatabaseUtil;
-import kr.ac.baekseok.recyclehelper.Data.Product;
-import kr.ac.baekseok.recyclehelper.Data.ProductStorage;
+import kr.ac.baekseok.recyclehelper.Data.SaleItem;
 import kr.ac.baekseok.recyclehelper.Data.User;
 import kr.ac.baekseok.recyclehelper.Fregment.CameraFragment;
 import kr.ac.baekseok.recyclehelper.Fregment.CommunityFragment;
 import kr.ac.baekseok.recyclehelper.Fregment.HomeFragment;
 import kr.ac.baekseok.recyclehelper.Fregment.ProfileFragment;
-import kr.ac.baekseok.recyclehelper.R;
+import kr.ac.baekseok.recyclehelper.Fregment.ShopFragment;
 
 public class MainActivity extends AppCompatActivity {
 
-    FirebaseFirestore db = DatabaseManager.getInstance().getDatabase();
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseApp.initializeApp(this);
 
-        // 커뮤니티를 위한 로그인 확인
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
             Intent intent = new Intent(this, LoginActivity.class);
@@ -60,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             DatabaseUtil.readUserInfo(db, user.getEmail(), callback -> {
                 User player = (User)callback;
                 User newUser = User.getInstance();
-                newUser.init(player.getEmail(), player.getNickname(), player.getPoint());
+                newUser.init(player.getEmail(), player.getNickname(), player.getPoint(), player.getRate(), player.getInventory() == null ? new ArrayList<SaleItem>() : player.getInventory());
 
                 Log.d("Main", "사용자 초기화 완료 ("+newUser.getNickname()+")");
 
@@ -82,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
                 selectedFragment = new CameraFragment();
             } else if (item.getItemId() == R.id.nav_community) {
                 selectedFragment = new CommunityFragment();
+            } else if (item.getItemId() == R.id.nav_shop) {
+                selectedFragment = new ShopFragment();
             }
 
             if (selectedFragment != null) {

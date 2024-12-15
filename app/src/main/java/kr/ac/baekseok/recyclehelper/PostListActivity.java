@@ -3,7 +3,6 @@ package kr.ac.baekseok.recyclehelper;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,15 +18,13 @@ import java.util.List;
 import kr.ac.baekseok.recyclehelper.Community.CommunityUtils;
 import kr.ac.baekseok.recyclehelper.Community.Post;
 import kr.ac.baekseok.recyclehelper.Community.PostAdapter;
-import kr.ac.baekseok.recyclehelper.Data.DatabaseManager;
-import kr.ac.baekseok.recyclehelper.R;
 
 public class PostListActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private PostAdapter adapter;
     private List<Post> postList = new ArrayList<>();
-    private FirebaseFirestore db = DatabaseManager.getInstance().getDatabase();
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String boardId;
 
     @Override
@@ -38,7 +35,6 @@ public class PostListActivity extends AppCompatActivity {
         // 게시판 ID 가져오기
         boardId = getIntent().getStringExtra("boardId");
 
-        // RecyclerView 초기화
         recyclerView = findViewById(R.id.recycler_view_posts);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new PostAdapter(postList, post -> {

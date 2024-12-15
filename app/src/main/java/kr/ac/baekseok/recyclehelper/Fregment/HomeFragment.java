@@ -22,7 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import kr.ac.baekseok.recyclehelper.Community.Post;
 import kr.ac.baekseok.recyclehelper.Data.Product;
+import kr.ac.baekseok.recyclehelper.Data.User;
 import kr.ac.baekseok.recyclehelper.R;
 
 public class HomeFragment extends Fragment {
@@ -30,6 +32,9 @@ public class HomeFragment extends Fragment {
     private ProductPostAdapter adapter;
     private List<Product> productList = new ArrayList<>();
     private FirebaseFirestore db;
+    private List<Post> postListNotice = new ArrayList<>();
+    private List<Post> postListQuestion = new ArrayList<>();
+    private List<User> rankingList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -43,8 +48,38 @@ public class HomeFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
         fetchRecentProducts();
-
+        fetchRecentPosts("3");
+        fetchRecentPosts("2");
+        fetchRanking();
         return view;
+    }
+    private void updateNoticeSection(List<Post> posts) {
+        TextView noticeTextView = getView().findViewById(R.id.tv_noticeList);
+        StringBuilder noticeContent = new StringBuilder();
+        for (Post post : posts) {
+            noticeContent.append("• ").append(post.getTitle()).append("\n");
+        }
+        noticeTextView.setText(noticeContent.toString());
+    }
+
+    private void updateQuestionSection(List<Post> posts) {
+        TextView questionTextView = getView().findViewById(R.id.tv_questionList);
+        StringBuilder questionContent = new StringBuilder();
+        for (Post post : posts) {
+            questionContent.append("• ").append(post.getTitle()).append("\n");
+        }
+        questionTextView.setText(questionContent.toString());
+    }
+
+    private void updateRankingSection(List<User> users) {
+        TextView noticeTextView = getView().findViewById(R.id.tv_ranking);
+        StringBuilder noticeContent = new StringBuilder();
+        int ranked = 0;
+        for (User user : users) {
+            ranked++;
+            noticeContent.append("• ").append(ranked).append(". ").append(user.getNickname()).append(" ").append(user.getRate()).append("회").append("\n");
+        }
+        noticeTextView.setText(noticeContent.toString());
     }
     private void fetchRecentProducts() {
         db.collection("Products")
@@ -60,6 +95,53 @@ public class HomeFragment extends Fragment {
                     adapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> Log.e("FirestoreError", "Failed to fetch products", e));
+    }
+
+    private void fetchRecentPosts(String boardId) {
+        db.collection("Posts")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .whereEqualTo("category", boardId)
+                .limit(3)
+                .get()
+                .addOnSuccessListener(query -> {
+
+                    if (boardId.equals("3")) {
+                        postListNotice.clear();
+                    } else if (boardId.equals("2")) {
+                        postListQuestion.clear();
+                    }
+
+                    for (QueryDocumentSnapshot doc : query) {
+                        Post post = doc.toObject(Post.class);
+                        if (boardId.equals("3")) {
+                            postListNotice.add(post);
+                        } else if (boardId.equals("2")) {
+                            postListQuestion.add(post);
+                        }
+                    }
+
+                    if (boardId.equals("3")) {
+                        updateNoticeSection(postListNotice);
+                    } else if (boardId.equals("2")) {
+                        updateQuestionSection(postListQuestion);
+                    }
+                });
+    }
+
+
+    private void fetchRanking() {
+        db.collection("Users")
+                .orderBy("rate", Query.Direction.DESCENDING)
+                .limit(10)
+                .get()
+                .addOnSuccessListener(query -> {
+                    for (QueryDocumentSnapshot doc : query) {
+                        User user = doc.toObject(User.class);
+                        rankingList.add(user);
+                    }
+
+                    updateRankingSection(rankingList);
+                });
     }
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -87,7 +169,7 @@ public class HomeFragment extends Fragment {
 
             holder.tvProductName.setText(product.getName());
             holder.tvProductMaterial.setText("재질: " + product.getMaterial());
-
+            holder.tvProductNumber.setText("바코드 번호 : "+product.getNumber());
             // 날짜 포맷 변환
             if (product.getTimestamp() != null) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
@@ -103,13 +185,14 @@ public class HomeFragment extends Fragment {
         }
 
         public class ProductViewHolder extends RecyclerView.ViewHolder {
-            TextView tvProductName, tvProductMaterial, tvProductTimestamp;
+            TextView tvProductName, tvProductMaterial, tvProductTimestamp, tvProductNumber;
 
             public ProductViewHolder(@NonNull View itemView) {
                 super(itemView);
                 tvProductName = itemView.findViewById(R.id.tvProductName);
                 tvProductMaterial = itemView.findViewById(R.id.tvProductMaterial);
                 tvProductTimestamp = itemView.findViewById(R.id.tvProductTimestamp);
+                tvProductNumber = itemView.findViewById(R.id.tvProductNumber);
             }
         }
     }

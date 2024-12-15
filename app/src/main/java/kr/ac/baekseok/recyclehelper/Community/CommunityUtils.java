@@ -7,10 +7,8 @@ import com.google.firebase.firestore.Query;
 import java.util.ArrayList;
 import java.util.List;
 
-import kr.ac.baekseok.recyclehelper.Data.DatabaseManager;
-
 public class CommunityUtils {
-    private static final FirebaseFirestore db = DatabaseManager.getInstance().getDatabase();
+    private static final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public static interface FirestoreCallback<T> {
         void onSuccess(T result);  // 성공 시 호출

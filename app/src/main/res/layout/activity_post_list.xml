@@ -16,6 +16,6 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:contentDescription="게시물 추가"
-        android:src="@drawable/ic_home" />
+        android:src="@drawable/ic_write" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
