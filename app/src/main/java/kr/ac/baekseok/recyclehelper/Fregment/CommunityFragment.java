@@ -35,12 +35,12 @@ public class CommunityFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_view_boards);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // 게시판 데이터 초기화
-        initializeBoardData();
+        boardList.add(new Board("3", "공지사항", "중요한 공지사항이 올라오는 곳입니다."));
+        boardList.add(new Board("1", "자유게시판", "일반적인 이야기를 나누는 곳입니다."));
+        boardList.add(new Board("2", "질문게시판", "질문과 답변을 주고받는 곳입니다."));
+        boardList.add(new Board("4", "제품별 재활용 방법들", "제품에 대한 재활용 방법을 확인할 수 있어요."));
 
-        // 어댑터 설정
         adapter = new BoardAdapter(boardList, board -> {
-            // 게시판 클릭 시 해당 게시물 목록으로 이동
             Intent intent = new Intent(getActivity(), PostListActivity.class);
             intent.putExtra("boardId", board.getId());
             startActivity(intent);
@@ -48,12 +48,5 @@ public class CommunityFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         return view;
-    }
-
-    private void initializeBoardData() {
-        boardList.add(new Board("3", "공지사항", "중요한 공지사항이 올라오는 곳입니다."));
-        boardList.add(new Board("1", "자유게시판", "일반적인 이야기를 나누는 곳입니다."));
-        boardList.add(new Board("2", "질문게시판", "질문과 답변을 주고받는 곳입니다."));
-        boardList.add(new Board("4", "제품별 재활용 방법들", "제품에 대한 재활용 방법을 확인할 수 있어요."));
     }
 }

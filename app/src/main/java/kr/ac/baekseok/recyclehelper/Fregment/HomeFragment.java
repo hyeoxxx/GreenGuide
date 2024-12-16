@@ -84,7 +84,7 @@ public class HomeFragment extends Fragment {
     private void fetchRecentProducts() {
         db.collection("Products")
                 .orderBy("timestamp", Query.Direction.DESCENDING)
-                .limit(10) // 최근 10개 제품만 가져오기
+                .limit(10)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     productList.clear();
@@ -170,7 +170,7 @@ public class HomeFragment extends Fragment {
             holder.tvProductName.setText(product.getName());
             holder.tvProductMaterial.setText("재질: " + product.getMaterial());
             holder.tvProductNumber.setText("바코드 번호 : "+product.getNumber());
-            // 날짜 포맷 변환
+
             if (product.getTimestamp() != null) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
                 holder.tvProductTimestamp.setText("등록일: " + dateFormat.format(product.getTimestamp()));

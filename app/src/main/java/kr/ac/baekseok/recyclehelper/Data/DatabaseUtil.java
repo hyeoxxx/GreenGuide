@@ -25,7 +25,6 @@ public class DatabaseUtil {
                         User user = documentSnapshot.toObject(User.class);
                         callback.onCallback(user);
                     } else {
-                        // 문서가 존재하지 않을 경우 null 전달
                         callback.onCallback(null);
                     }
                 })

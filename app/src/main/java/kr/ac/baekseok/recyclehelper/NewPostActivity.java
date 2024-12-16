@@ -16,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import kr.ac.baekseok.recyclehelper.Community.CommunityUtils;
 import kr.ac.baekseok.recyclehelper.Community.Post;
+import kr.ac.baekseok.recyclehelper.Data.DatabaseUtil;
 import kr.ac.baekseok.recyclehelper.Data.Product;
 import kr.ac.baekseok.recyclehelper.Data.ProductStorage;
 import kr.ac.baekseok.recyclehelper.Data.User;
@@ -40,7 +41,6 @@ public class NewPostActivity extends AppCompatActivity {
         barNum = getIntent().getStringExtra("barcode");
         barName = getIntent().getStringExtra("barName");
 
-        // 게시판 ID 가져오기
         boardId = getIntent().getStringExtra("boardId");
         if (barNum != null) {
             edtTitle.setText(barName + "(" + barNum + ")");
@@ -88,8 +88,12 @@ public class NewPostActivity extends AppCompatActivity {
                             } else {
                                 User user = User.getInstance();
                                 user.gainPoint(100);
-                                user.gainRate(100);
-                                user = null;
+                                user.gainRate(1);
+
+                                DatabaseUtil.saveUserInfo(db, user, back -> {
+
+                                });
+
                             }
                         });
                     });

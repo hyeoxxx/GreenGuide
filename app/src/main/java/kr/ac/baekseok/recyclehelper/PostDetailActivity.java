@@ -45,44 +45,20 @@ public class PostDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_detail);
 
-        // View 초기화
         txtTitle = findViewById(R.id.txt_post_title);
         txtAuthor = findViewById(R.id.txt_post_author);
         txtContent = findViewById(R.id.txt_post_content);
         recyclerViewComments = findViewById(R.id.recycler_view_comments);
         edtComment = findViewById(R.id.edt_comment);
         btnAddComment = findViewById(R.id.btn_add_comment);
-        btnDeletePost = findViewById(R.id.btn_delete);
-        btnEditPost = findViewById(R.id.btn_edit);
-        // 게시물 ID 가져오기
         postId = getIntent().getStringExtra("postId");
-
-        // 댓글 RecyclerView 초기화
         recyclerViewComments.setLayoutManager(new LinearLayoutManager(this));
         adapter = new CommentAdapter(commentList);
         recyclerViewComments.setAdapter(adapter);
-
-        // 게시물 로드
         loadPost();
-
-        // 댓글 로드
         loadComments();
-
-        // 댓글 추가 버튼 클릭 이벤트
         btnAddComment.setOnClickListener(v -> addComment());
-
-        // 수정/삭제 버튼 설정
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null || currentPost == null || !user.getUid().equals(currentPost.getAuthorId())) {
-            btnEditPost.setVisibility(View.GONE);
-            btnDeletePost.setVisibility(View.GONE);
-        } else {
-            btnEditPost.setVisibility(View.VISIBLE);
-            btnDeletePost.setVisibility(View.VISIBLE);
-
-            btnEditPost.setOnClickListener(v -> editPost());
-            btnDeletePost.setOnClickListener(v -> deletePost());
-        }
     }
 
     private void loadPost() {
@@ -150,13 +126,5 @@ public class PostDetailActivity extends AppCompatActivity {
                 Log.e("PostDetailActivity", "댓글 추가 실패", e);
             }
         });
-    }
-
-    private void editPost() {
-        // 수정 로직 구현 (Intent를 통해 수정 Activity로 이동)
-    }
-
-    private void deletePost() {
-        // 삭제 로직 구현
     }
 }

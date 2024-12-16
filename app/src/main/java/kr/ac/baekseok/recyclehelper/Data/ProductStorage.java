@@ -6,10 +6,6 @@ import android.widget.Toast;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
-/*
-    작성자 최혁 (griscaf@gmail.com)
-    상품 정보의 처리를 보다 효율적으로 하기 위함
- */
 public class ProductStorage {
 
     public static void SaveProduct(FirebaseFirestore db, Product item, FirestoreCallback callback) {
@@ -31,7 +27,6 @@ public class ProductStorage {
                     Product product = documentSnapshot.toObject(Product.class);
                     callback.onCallback(product);
                 } else {
-                    // 문서가 존재하지 않을 경우 null 전달
                     callback.onCallback(null);
                 }
             })

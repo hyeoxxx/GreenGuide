@@ -32,29 +32,25 @@ public class PostListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_list);
 
-        // 게시판 ID 가져오기
         boardId = getIntent().getStringExtra("boardId");
 
         recyclerView = findViewById(R.id.recycler_view_posts);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new PostAdapter(postList, post -> {
-            // 게시물 클릭 시 게시물 상세보기로 이동
+
             Intent intent = new Intent(PostListActivity.this, PostDetailActivity.class);
             intent.putExtra("postId", post.getPostId());
             startActivity(intent);
         });
         recyclerView.setAdapter(adapter);
 
-        // FloatingActionButton 초기화
         FloatingActionButton fabAddPost = findViewById(R.id.fab_add_post);
         fabAddPost.setOnClickListener(v -> {
-            // 게시물 작성 화면으로 이동
                 Intent intent = new Intent(PostListActivity.this, NewPostActivity.class);
-            intent.putExtra("boardId", boardId);
+                intent.putExtra("boardId", boardId);
             startActivity(intent);
         });
 
-        // 게시물 데이터 로드
         loadPosts();
     }
 

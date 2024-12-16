@@ -71,30 +71,33 @@ public class CameraFragment extends Fragment {
                                                Toast.makeText(getContext(), "제품 정보를 정상적으로 불러오지 않았습니다.", Toast.LENGTH_SHORT).show();
                                                return;
                                            }
-                                           HasRecycleInfo(item.getPostId(), result -> {
-                                               if (result == null) {
-                                                       AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                                                       builder.setTitle("환경에 기여해주세요 !");
-                                                       builder.setMessage("아직 이 제품에 대한 재활용 방법이 작성되지 않았어요.\n작성해주신다면 100P를 지급해드려요 !");
+                                           if (item.getPostId().equals("")) {
+                                               AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                               builder.setTitle("환경에 기여해주세요 !");
+                                               builder.setMessage("아직 이 제품에 대한 재활용 방법이 작성되지 않았어요.\n작성해주신다면 100P를 지급해드려요 !");
 
-                                                       builder.setPositiveButton("예", (dialog, which) -> {
-                                                           Intent intent = new Intent(getContext(), NewPostActivity.class);
-                                                           intent.putExtra("barName", barName);
-                                                           intent.putExtra("barcode", barNum);
-                                                           intent.putExtra("boardId", "4");
-                                                           startActivity(intent);
-                                                       });
-                                                       builder.setNegativeButton("아니오", (dialog, which) -> {
-                                                           dialog.dismiss();
-                                                       });
-
-                                                       builder.show();
-                                               } else {
-                                                   Intent intent = new Intent(getContext(), PostDetailActivity.class);
-                                                   intent.putExtra("postId", ((Product)result).getPostId());
+                                               builder.setPositiveButton("예", (dialog, which) -> {
+                                                   Intent intent = new Intent(getContext(), NewPostActivity.class);
+                                                   intent.putExtra("barName", barName);
+                                                   intent.putExtra("barcode", barNum);
+                                                   intent.putExtra("boardId", "4");
                                                    startActivity(intent);
-                                               }
-                                           });
+                                               });
+                                               builder.setNegativeButton("아니오", (dialog, which) -> {
+                                                   dialog.dismiss();
+                                               });
+
+                                               builder.show();
+                                           } else {
+                                               HasRecycleInfo(item.getPostId(), result -> {
+                                                   Log.d("asd", "dd + " + result);
+                                                   if (result != null) {
+                                                       Intent intent = new Intent(getContext(), PostDetailActivity.class);
+                                                       intent.putExtra("postId", ((Product)result).getPostId());
+                                                       startActivity(intent);
+                                                   }
+                                               });
+                                           }
                                        }
                                    });
 
@@ -148,7 +151,7 @@ public class CameraFragment extends Fragment {
 
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*"); // 이미지 파일만 선택 가능
+        intent.setType("image/*");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         startActivityForResult(intent, REQUEST_FILE);
     }
@@ -166,13 +169,10 @@ public class CameraFragment extends Fragment {
                                 requireActivity().getContentResolver(),
                                 selectedImageUri
                         );
-                        // 미리보기 이미지 설정 (수정필요)
                         imgPreview.setImageBitmap(imageBitmap);
 
-                        // 바코드 스캔 (정확도 대박)
                         scanBarcodeFromBitmap(imageBitmap);
                     } catch (IOException e) {
-                        e.printStackTrace();
                         Toast.makeText(getContext(), "이미지를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
                     }
                 } else {

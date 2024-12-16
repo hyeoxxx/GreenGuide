@@ -28,7 +28,7 @@ import kr.ac.baekseok.recyclehelper.R;
 public class ProfileFragment extends Fragment {
     private TextView tv_nickname, tv_point;
     private FirebaseFirestore db;
-    private TextView tv_setProfile, tv_inventory, tv_alram;
+    private TextView tv_setProfile, tv_inventory, tv_alram, btn_logout, tv_rate;
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
     @Nullable
@@ -42,8 +42,11 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         tv_nickname = view.findViewById(R.id.tv_user_nickname);
         tv_point = view.findViewById(R.id.tv_user_point);
+        tv_rate = view.findViewById(R.id.tv_user_rate);
+
         tv_setProfile = view.findViewById(R.id.btn_setting);
         tv_inventory = view.findViewById(R.id.btn_inventory);
+        btn_logout = view.findViewById(R.id.btn_logout);
         db = FirebaseFirestore.getInstance();
 
         DatabaseUtil.readUserInfo(db, user.getEmail(), back -> {
@@ -53,6 +56,7 @@ public class ProfileFragment extends Fragment {
             User player = User.getInstance();
             tv_nickname.setText(player.getNickname() + "님 환영합니다 !");
             tv_point.setText(player.getPoint() + "P");
+            tv_rate.setText(player.getRate()+ "회");
         });
         tv_setProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,7 +79,7 @@ public class ProfileFragment extends Fragment {
                     if (!inputText.isEmpty()) {
                         User user = User.getInstance();
                         db.collection("Users")
-                                .whereEqualTo("nickname", inputText) // 닉네임 필드 쿼리
+                                .whereEqualTo("nickname", inputText)
                                 .get()
                                 .addOnCompleteListener(task -> {
                                     if (task.isSuccessful() && task.getResult() != null) {
@@ -111,6 +115,16 @@ public class ProfileFragment extends Fragment {
             public void onClick(View view) {
                 Intent intent = new Intent(getContext(), InventoryActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        btn_logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(getContext(), LoginActivity.class);
+                startActivity(intent);
+                Toast.makeText(getContext(), "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
             }
         });
 

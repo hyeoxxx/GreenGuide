@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
 
-        // 초기 화면 설정
         loadFragment(new HomeFragment());
 
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {

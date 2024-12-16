@@ -1,13 +1,13 @@
 package kr.ac.baekseok.recyclehelper.Community;
 
 public class Post {
-    private String postId;        // 게시물 ID
-    private String authorId;      // 작성자 ID
-    private String authorName;    // 작성자 닉네임
-    private String title;         // 게시물 제목
-    private String content;       // 게시물 내용
-    private long timestamp;       // 작성 시간
-    private String category;      // 카테고리
+    private String postId;
+    private String authorId;
+    private String authorName;
+    private String title;
+    private String content;
+    private long timestamp;
+    private String category;
 
     public Post() {}
 

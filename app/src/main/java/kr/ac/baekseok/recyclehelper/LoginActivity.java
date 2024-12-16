@@ -2,6 +2,7 @@ package kr.ac.baekseok.recyclehelper;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +34,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         db = FirebaseFirestore.getInstance();
-        // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
         edtEmail = findViewById(R.id.edt_email);
@@ -74,37 +74,43 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("제품 정보 추가");
+        builder.setTitle("회원가입");
 
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_register, null);
         builder.setView(dialogView);
 
         EditText edtRegEmail = dialogView.findViewById(R.id.edt_reg_email);
         EditText edtRegPassword = dialogView.findViewById(R.id.edt_reg_password);
+        edtRegPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        edtRegEmail.setText(edtEmail.getText());
+        edtRegPassword.setText(edtPassword.getText());
         EditText edtRegNick = dialogView.findViewById(R.id.edt_reg_nickname);
 
 
         builder.setPositiveButton("회원가입", (dialog, which) -> {
             String nickName = edtRegNick.getText().toString().trim();
             if (!nickName.isEmpty()) {
-                mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                checkNickNameExists(nickName, exist -> {
-                                    if (!exist) {
-                                        Toast.makeText(this, "닉네임이 중복되었습니다. 다른 닉네임을 사용해주세요.", Toast.LENGTH_SHORT).show();
-                                        return;
-                                    }
-                                    List<SaleItem> list = new ArrayList<SaleItem>();
-                                    User user = new User(email, nickName, 0, 0, list);
-                                    DatabaseUtil.saveUserInfo(db, user, isSuccess -> {
-                                        Toast.makeText(this, "회원가입 성공 !", Toast.LENGTH_SHORT).show();
-                                    });
-                                });
+                checkNickNameExists(nickName, exist -> {
+                            if (exist) {
+                                Toast.makeText(this, "닉네임이 중복되었습니다. 다른 닉네임을 사용해주세요.", Toast.LENGTH_SHORT).show();
+                                return;
                             } else {
-                                Toast.makeText(this, "다음과 같은 사유로 회원가입에 실패하였습니다 : " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                mAuth.createUserWithEmailAndPassword(email, password)
+                                        .addOnCompleteListener(task -> {
+                                                    if (task.isSuccessful()) {
+                                                        List<SaleItem> list = new ArrayList<SaleItem>();
+                                                        User user = new User(email, nickName, 0, 0, list);
+                                                        DatabaseUtil.saveUserInfo(db, user, isSuccess -> {
+                                                            Toast.makeText(this, "회원가입 성공 !", Toast.LENGTH_SHORT).show();
+                                                        });
+                                                    } else {
+                                                        Toast.makeText(this, "다음과 같은 사유로 회원가입에 실패하였습니다 : " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                        );
                             }
-                        });
+                        }
+                );
             } else {
                 Toast.makeText(this, "모든 필드를 입력해주세요.", Toast.LENGTH_SHORT).show();
             }
@@ -119,14 +125,14 @@ public class LoginActivity extends AppCompatActivity {
 
     private void checkNickNameExists(String nick, Callback callback) {
         db.collection("Users")
-                .whereEqualTo("nickname", nick) // 닉네임 필드 쿼리
+                .whereEqualTo("nickname", nick)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
-                        boolean exists = !task.getResult().isEmpty(); // 닉네임 중복 여부
+                        boolean exists = !task.getResult().isEmpty();
                         callback.onResult(exists);
                     } else {
-                        callback.onResult(false); // 쿼리 실패 시 중복 없음으로 처리
+                        callback.onResult(false);
                     }
                 });
     }
